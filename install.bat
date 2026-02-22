@@ -37,7 +37,7 @@ IF NOT EXIST "%APP_DIR%.env" (
 echo.
 echo [2/6] Composer bagimliliklar yukleniyor...
 cd /d "%APP_DIR%"
-%COMPOSER% install --working-dir "%APP_DIR%" --no-interaction --prefer-dist
+%COMPOSER% install --working-dir "." --no-interaction --prefer-dist
 IF %ERRORLEVEL% NEQ 0 (
     echo HATA: Composer yukleme basarisiz!
     pause
