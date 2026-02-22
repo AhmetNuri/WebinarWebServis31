@@ -9,15 +9,19 @@ SET PHP=D:\XAMPP\php\php.exe
 SET APP_DIR=%~dp0
 
 REM Composer yolunu otomatik tespit et
-IF EXIST "D:\composer\composer.bat" (
+where composer >nul 2>&1
+IF %ERRORLEVEL% EQU 0 (
+    SET COMPOSER=composer
+) ELSE IF EXIST "D:\composer\composer.bat" (
     SET COMPOSER=call "D:\composer\composer.bat"
 ) ELSE IF EXIST "D:\composer\composer.phar" (
     SET COMPOSER="%PHP%" "D:\composer\composer.phar"
 ) ELSE IF EXIST "D:\composer\composer" (
     SET COMPOSER="%PHP%" "D:\composer\composer"
 ) ELSE (
-    echo HATA: Composer D:\composer klasoründe bulunamadi!
-    echo Lutfen D:\composer\composer.bat veya composer.phar dosyasinin varligini kontrol edin.
+    echo HATA: Composer bulunamadi!
+    echo Lutfen Composer'i PATH'e ekleyin veya D:\composer klasorune yerlestirin.
+    echo Composer indirmek icin: https://getcomposer.org/download/
     pause
     exit /b 1
 )
@@ -33,7 +37,7 @@ IF NOT EXIST "%APP_DIR%.env" (
 echo.
 echo [2/6] Composer bagimliliklar yukleniyor...
 cd /d "%APP_DIR%"
-%COMPOSER% install --no-interaction --prefer-dist
+%COMPOSER% install --working-dir "%APP_DIR%" --no-interaction --prefer-dist
 IF %ERRORLEVEL% NEQ 0 (
     echo HATA: Composer yukleme basarisiz!
     pause
