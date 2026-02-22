@@ -6,7 +6,7 @@ echo ============================================================
 echo.
 
 SET PHP=D:\XAMPP\php\php.exe
-SET COMPOSER=composer
+SET COMPOSER=D:\composer\composer
 SET APP_DIR=%~dp0
 
 echo [1/6] .env dosyasi olusturuluyor...
@@ -20,7 +20,7 @@ IF NOT EXIST "%APP_DIR%.env" (
 echo.
 echo [2/6] Composer bagimliliklar yukleniyor...
 cd /d "%APP_DIR%"
-%COMPOSER% install --no-interaction --prefer-dist
+"%COMPOSER%" install --no-interaction --prefer-dist
 IF %ERRORLEVEL% NEQ 0 (
     echo HATA: Composer yukleme basarisiz!
     pause
@@ -29,11 +29,11 @@ IF %ERRORLEVEL% NEQ 0 (
 
 echo.
 echo [3/6] Uygulama anahtari olusturuluyor...
-%PHP% artisan key:generate
+"%PHP%" artisan key:generate
 
 echo.
 echo [4/6] Storage ve cache linkleri olusturuluyor...
-%PHP% artisan storage:link
+"%PHP%" artisan storage:link
 
 echo.
 echo [5/6] Veritabani kurulumu...
@@ -47,7 +47,7 @@ IF /I "%CONTINUE%" NEQ "E" (
     exit /b 0
 )
 
-%PHP% artisan migrate --seed
+"%PHP%" artisan migrate --seed
 IF %ERRORLEVEL% NEQ 0 (
     echo HATA: Veritabani migrasyonu basarisiz!
     echo .env dosyasindaki DB ayarlarini kontrol edin.
