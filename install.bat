@@ -6,8 +6,21 @@ echo ============================================================
 echo.
 
 SET PHP=D:\XAMPP\php\php.exe
-SET COMPOSER=D:\composer\composer
 SET APP_DIR=%~dp0
+
+REM Composer yolunu otomatik tespit et
+IF EXIST "D:\composer\composer.bat" (
+    SET COMPOSER=call "D:\composer\composer.bat"
+) ELSE IF EXIST "D:\composer\composer.phar" (
+    SET COMPOSER="%PHP%" "D:\composer\composer.phar"
+) ELSE IF EXIST "D:\composer\composer" (
+    SET COMPOSER="%PHP%" "D:\composer\composer"
+) ELSE (
+    echo HATA: Composer D:\composer klasoründe bulunamadi!
+    echo Lutfen D:\composer\composer.bat veya composer.phar dosyasinin varligini kontrol edin.
+    pause
+    exit /b 1
+)
 
 echo [1/6] .env dosyasi olusturuluyor...
 IF NOT EXIST "%APP_DIR%.env" (
@@ -20,7 +33,7 @@ IF NOT EXIST "%APP_DIR%.env" (
 echo.
 echo [2/6] Composer bagimliliklar yukleniyor...
 cd /d "%APP_DIR%"
-"%COMPOSER%" install --no-interaction --prefer-dist
+%COMPOSER% install --no-interaction --prefer-dist
 IF %ERRORLEVEL% NEQ 0 (
     echo HATA: Composer yukleme basarisiz!
     pause
