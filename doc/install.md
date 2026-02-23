@@ -160,6 +160,16 @@ mysqldump -u root saas_lisans > saas_lisans_dump.sql
 
 ---
 
+## FireMonkey Örnek İstemci Uygulaması
+
+Sisteme bağlanan tam işlevli bir Delphi FireMonkey örnek uygulaması `client/LicenseCheckFMX/` klasöründe bulunmaktadır.
+
+Uygulama `TRESTClient`, `TRESTRequest`, `TRESTResponse` bileşenlerini kullanmakta; Windows, macOS, iOS, Android ve Linux için derlenebilmektedir.
+
+Detaylar için: [`client/LicenseCheckFMX/README.md`](../client/LicenseCheckFMX/README.md)
+
+---
+
 ## API Kullanımı (Delphi VCL Rest Client)
 
 ### Endpoint

@@ -1,0 +1,200 @@
+object frmMain: TfrmMain
+  Left = 0
+  Top = 0
+  Caption = 'Lisans Kontrol - FireMonkey'
+  ClientHeight = 620
+  ClientWidth = 480
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object RESTClient1: TRESTClient
+    Accept = 'application/json, text/plain; q=0.9, text/html;q=0.8,'
+    AcceptCharset = 'UTF-8, *;q=0.8'
+    BaseURL = 'http://localhost:8000'
+    RaiseExceptionOn500 = False
+    Left = 392
+    Top = 16
+  end
+  object RESTRequest1: TRESTRequest
+    Client = RESTClient1
+    Params = <>
+    Resource = 'api/v1/license/check'
+    Response = RESTResponse1
+    Left = 392
+    Top = 64
+  end
+  object RESTResponse1: TRESTResponse
+    ContentType = 'application/json'
+    Left = 392
+    Top = 112
+  end
+  object LayoutMain: TLayout
+    Align = alClient
+    Padding.Left = 16.0
+    Padding.Top = 16.0
+    Padding.Right = 16.0
+    Padding.Bottom = 16.0
+    Size.Width = 480.0
+    Size.Height = 620.0
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object lblTitle: TLabel
+      Align = alTop
+      Size.Width = 448.0
+      Size.Height = 36.0
+      Size.PlatformDefault = False
+      Text = 'Lisans Kontrol Paneli'
+      TextSettings.Font.Size = 18.0
+      TextSettings.Font.Style = [fsBold]
+      TextSettings.HorzAlign = taCenter
+      Margins.Bottom = 12.0
+    end
+    object LayoutFields: TLayout
+      Align = alTop
+      Size.Width = 448.0
+      Size.Height = 276.0
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object lblBaseURL: TLabel
+        Align = alTop
+        Margins.Bottom = 2.0
+        Size.Width = 448.0
+        Size.Height = 20.0
+        Size.PlatformDefault = False
+        Text = 'Sunucu URL:'
+        TextSettings.Font.Style = [fsBold]
+      end
+      object edtBaseURL: TEdit
+        Align = alTop
+        Margins.Bottom = 10.0
+        Size.Width = 448.0
+        Size.Height = 36.0
+        Size.PlatformDefault = False
+        TabOrder = 0
+        Text = 'http://localhost:8000'
+        TextPrompt = 'https://sizin-domain.com'
+      end
+      object lblEmail: TLabel
+        Align = alTop
+        Margins.Bottom = 2.0
+        Size.Width = 448.0
+        Size.Height = 20.0
+        Size.PlatformDefault = False
+        Text = 'E-posta Adresi: *'
+        TextSettings.Font.Style = [fsBold]
+      end
+      object edtEmail: TEdit
+        Align = alTop
+        Margins.Bottom = 10.0
+        Size.Width = 448.0
+        Size.Height = 36.0
+        Size.PlatformDefault = False
+        KeyboardType = ktEmailAddress
+        TabOrder = 1
+        TextPrompt = 'kullanici@ornek.com'
+      end
+      object lblSerialNumber: TLabel
+        Align = alTop
+        Margins.Bottom = 2.0
+        Size.Width = 448.0
+        Size.Height = 20.0
+        Size.PlatformDefault = False
+        Text = 'Seri Numarası: *'
+        TextSettings.Font.Style = [fsBold]
+      end
+      object edtSerialNumber: TEdit
+        Align = alTop
+        Margins.Bottom = 10.0
+        Size.Width = 448.0
+        Size.Height = 36.0
+        Size.PlatformDefault = False
+        TabOrder = 2
+        TextPrompt = 'XXXXXXXX-XXXXXXXX-XXXXXXXX'
+      end
+      object lblDeviceID: TLabel
+        Align = alTop
+        Margins.Bottom = 2.0
+        Size.Width = 448.0
+        Size.Height = 20.0
+        Size.PlatformDefault = False
+        Text = 'Cihaz ID (isteğe bağlı):'
+        TextSettings.Font.Style = [fsBold]
+      end
+      object edtDeviceID: TEdit
+        Align = alTop
+        Margins.Bottom = 10.0
+        Size.Width = 448.0
+        Size.Height = 36.0
+        Size.PlatformDefault = False
+        TabOrder = 3
+        TextPrompt = 'FMX-WIN-XXXXXXXX'
+      end
+    end
+    object LayoutButtons: TLayout
+      Align = alTop
+      Margins.Bottom = 12.0
+      Size.Width = 448.0
+      Size.Height = 44.0
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object btnCheck: TButton
+        Align = alLeft
+        Margins.Right = 8.0
+        Size.Width = 200.0
+        Size.Height = 44.0
+        Size.PlatformDefault = False
+        StyleLookup = 'buttonStyle'
+        TabOrder = 0
+        Text = 'Lisansı Kontrol Et'
+        OnClick = btnCheckClick
+      end
+      object btnClear: TButton
+        Align = alLeft
+        Size.Width = 120.0
+        Size.Height = 44.0
+        Size.PlatformDefault = False
+        TabOrder = 1
+        Text = 'Temizle'
+        OnClick = btnClearClick
+      end
+      object lblStatus: TLabel
+        Align = alRight
+        Size.Width = 112.0
+        Size.Height = 44.0
+        Size.PlatformDefault = False
+        Text = 'Haz'#305'r'
+        FontColor = claGray
+        TextSettings.HorzAlign = taTrailing
+        TextSettings.VertAlign = taVerticalCenter
+      end
+    end
+    object LayoutResult: TLayout
+      Align = alClient
+      Size.Width = 448.0
+      Size.Height = 240.0
+      Size.PlatformDefault = False
+      TabOrder = 2
+      object lblResultTitle: TLabel
+        Align = alTop
+        Margins.Bottom = 4.0
+        Size.Width = 448.0
+        Size.Height = 20.0
+        Size.PlatformDefault = False
+        Text = 'Sonuç:'
+        TextSettings.Font.Style = [fsBold]
+      end
+      object memoResult: TMemo
+        Align = alClient
+        Size.Width = 448.0
+        Size.Height = 216.0
+        Size.PlatformDefault = False
+        ReadOnly = True
+        TabOrder = 0
+        Viewport.Width = 444.0
+        Viewport.Height = 212.0
+      end
+    end
+  end
+end
