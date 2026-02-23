@@ -203,46 +203,70 @@ Accept: application/json
 - Endpoint başına dakikada 30 istek limiti uygulanmaktadır.
 - Limit aşıldığında `429 Too Many Requests` yanıtı döner.
 
-### Delphi Örnek Kod
-```delphi
-procedure TForm1.CheckLicense;
-var
-  RESTClient: TRESTClient;
-  RESTRequest: TRESTRequest;
-  RESTResponse: TRESTResponse;
-  JSONObj: TJSONObject;
-begin
-  RESTClient := TRESTClient.Create('https://sizin-domain.com');
-  RESTRequest := TRESTRequest.Create(nil);
-  RESTResponse := TRESTResponse.Create(nil);
-  try
-    RESTClient.BaseURL := 'https://sizin-domain.com';
-    RESTRequest.Client := RESTClient;
-    RESTRequest.Response := RESTResponse;
-    RESTRequest.Resource := 'api/v1/license/check';
-    RESTRequest.Method := rmPOST;
-    RESTRequest.AddBody(
-      '{"email":"user@example.com","serial_number":"XXXX-XXXX-XXXX","device_id":"HW123"}',
-      TRESTContentType.ctAPPLICATION_JSON
-    );
-    RESTRequest.Execute;
+---
 
-    if RESTResponse.StatusCode = 200 then
-    begin
-      JSONObj := TJSONObject.ParseJSONValue(RESTResponse.Content) as TJSONObject;
-      try
-        if JSONObj.GetValue<Boolean>('valid') then
-          ShowMessage('Lisans geçerli! Bitiş: ' + JSONObj.GetValue<string>('expires_at'))
-        else
-          ShowMessage('Lisans geçersiz: ' + JSONObj.GetValue<string>('message'));
-      finally
-        JSONObj.Free;
-      end;
-    end;
+## Delphi İstemci Entegrasyonu
+
+### Hazır TLicenseClient Ünitesi
+
+Projenin `doc/delphi/LicenseClient.pas` dosyası, web servisiyle iletişimi tamamen kapsayan
+yeniden kullanılabilir bir `TLicenseClient` sınıfı içermektedir.
+
+**Özellikler:**
+- `TRESTClient` / `TRESTRequest` / `TRESTResponse` üzerine kurulu
+- Windows Kayıt Defteri'nden otomatik HWID (cihaz kimliği) üretimi
+- HTTP hataları ve zaman aşımı için yerleşik hata işleme
+- `TLicenseCheckResult` kaydı ile temiz, tip güvenli sonuç
+
+**Adımlar:**
+1. `doc/delphi/LicenseClient.pas` dosyasını projenize kopyalayın.
+2. Formu veya modülü kullanan birimin `uses` bölümüne `LicenseClient` ekleyin.
+3. Aşağıdaki örnek kodu kullanın.
+
+### Delphi Örnek Kod
+
+```delphi
+uses LicenseClient;
+
+procedure TForm1.BtnCheckLicenseClick(Sender: TObject);
+var
+  Client: TLicenseClient;
+  Result: TLicenseCheckResult;
+begin
+  Client := TLicenseClient.Create('https://sizin-domain.com');
+  try
+    Result := Client.CheckLicense(
+      'kullanici@ornek.com',   // e-posta
+      'XXXX-XXXX-XXXX-XXXX'   // seri numarası
+      // device_id belirtilmezse otomatik üretilir
+    );
   finally
-    RESTClient.Free;
-    RESTRequest.Free;
-    RESTResponse.Free;
+    Client.Free;
   end;
+
+  // Ağ/sunucu hatası
+  if Result.NetworkError <> '' then
+  begin
+    ShowMessage('Bağlantı hatası: ' + Result.NetworkError);
+    Exit;
+  end;
+
+  if Result.Valid then
+  begin
+    ShowMessage(Format(
+      'Lisans geçerli!'      + sLineBreak +
+      'Paket : %s'           + sLineBreak +
+      'Tür   : %s'           + sLineBreak +
+      'Bitiş : %s'           + sLineBreak +
+      'Kalan : %d gün',
+      [Result.Package, Result.LicenseType,
+       Result.ExpiresAt, Result.DaysLeft]
+    ));
+
+    if Result.Warning <> '' then
+      ShowMessage('Uyarı: ' + Result.Warning);
+  end
+  else
+    ShowMessage('Lisans geçersiz: ' + Result.ErrorMessage);
 end;
 ```
