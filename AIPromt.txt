@@ -1,0 +1,102 @@
+AI Promt : 
+Sen deneyimli bir full-stack Laravel geliştiricisisin. Aşağıda tarif edilen SaaS tipi lisanslama sistemini baştan sona tasarlayacak ve geliştireceksin.
+Proje gereksinimleri ve zorunlu kurallar şunlardır:
+TEMEL TEKNOLOJİ YÖNERGELERİ
+• Backend: Laravel 12
+• PHP sürümü: minimum 8.2
+• Veritabanı: MySQL 8+
+• Mimari: Tamamen RESTful API tabanlı .
+• Frontend: Laravel Blade + Tailwind CSS (veya Livewire )
+• Api sistemini kullanacak clientlar Delphi VCL rest client lar. Sistem buna uyumlu tasarlanmaldır.
+• Hosting hedefi: Paylaşımlı cPanel hosting (Composer çalışmaz → localde geliştir, production build alıp taşı)
+KULLANICI AKIŞI – ZORUNLU ADIMLAR
+ Sistem olduğunca basit olarak tasarlanmaldır. Çok fazla komplex yapılar kurulumu zorlaştırıyor.
+
+Kayıt Admin arayüzünden admin tarafından girilir.
+   - Kullanıcı email + şifre ile kayıt olur
+Lisans Anahtarı (Seri Numarası) Üretimi
+   - Admin arayüzünden kullanıcıya lisans tanımlanır. benzersiz lisans anahtarı alanı olmalıdır.
+Lisans Tablosu Alanları (zorunlu)
+   • user_id
+   • device_id (nullable)
+   • serial_number (benzersiz, varchar(32-64))
+   • starts_at (datetime)
+   • lasetCheked_Date (datetime) lisansızn en son ne zaman kullanıldığı
+   • lasetCheked_device_id (nullable)
+   • Acil boolean (responsa aynen ekleencek client kullanacak)
+   • expires_at (datetime)
+   • created_at
+   • license_type (enum: demo, monthly, yearly, lifetime vb.)
+   • product_package (varchar: DelphiRestService, Basic, Premium vb.)
+   • user_enable (Kullancı geçici olarak asıkıya alınabilir)
+   • MaxConnectionCount (Aynı anda bağlantı yapabilecek kullancı sayısı)
+  
+Lisans Kontrol API Endpoint'i (en kritik kısım)
+   POST /api/v1/license/check
+   Gelen body (JSON):
+   {
+     "email": "zorunlu",
+     "serial_number": "zorunlu",
+     "device_id": "opsiyonel"
+   }
+   Kontrol mantığı:
+   • device_id GELMEDİYSE → sadece email + serial_number ile sorgula
+   • device_id GELDİYSE → email + serial_number + device_id ile sorgula
+   Dönüş (JSON):
+   Başarılı durum:
+   {
+     "valid": true,
+     "expires_at": "2026-08-15",
+     "days_left": 8,
+     "warning": "Lisansınızın bitmesine 10 günden az kaldı!" // sadece <10 gün kaldıysa
+     "package": "DelphiRestService",
+     "type": "yearly"
+     "emergency": false (acil durumlar için geçici lisans tagı) Şimdilik sadece ekleyelim.
+   }
+   Başarısız durum:
+   {
+     "valid": false,
+     "message": "Lisans bulunamadı / süresi doldu / cihaz eşleşmedi vb."
+   }
+   • Her başarısız kontrolde error log talbosuna yaz (ayrı log tablosu)
+   • Eğer DeviceId var ise Hardware fingerprint / cihaz bağlama sayısı sınırlaması yapılmaldır
+Loglama Sistemi
+   - ayrı tablo: Liclogs tablosu kullan.
+   - Seviyeler: info, debug, error
+   - Sadece önemli olaylar loglansın (sistemi yormayacak şekilde)
+   - Örnek: geçersiz lisans kontrolü, cihaz değişikliği, blacklist girişi vb.
+Kullanıcı Self-Servis Paneli (Blade / Livewire)
+   - Şifre değiştirme
+   - Aktif lisansları listeleme (serial_number, expires_at, days_left, package)
+   - Lisans durumu (aktif / süresi dolmuş / yakında bitecek)
+Admin Paneli (en azından basit CRUD arayüzleri)
+   - Kullanıcılar listesi + arama
+   - Lisans bilgileri (LisNS TABLOSU DÜZENLEME)
+   - Kullanıcı bazında lisans yönetimi (ekle, süre uzat, lisans tipi değiştir)
+   - Lisans süre uzatma / grace period tanımlama
+   - Blacklist / suspend mekanizması (kullanıcı veya cihaz bazında)
+   - Hata/log mesajlarını görüntüleme ekranı
+Ek Özellikler & Kurallar
+   - Sistem basit bir yapı üzerine tasarlanmaldır.
+   - OpneSll paketi kullanılmamamlıdır.
+   - Aynı serial ile birden fazla cihaz bağlanabilir mi? → Şimdilik hayır (device_id kontrolü aktif) ilerde eklenebilir.
+   - Tüm API'ler authentication middleware ile korunmalı (kullanıcı sadece kendi lisanslarını görememeli vs.)
+   - Rate limiting & brute-force koruması lisans kontrol endpoint’inde
+   -Client lar Delphi   vcl ve firemonkey ile yazılan masa üstü uygulamalar. Tüm sistem Delphi native rest bileşenleri ile uyumlu olmaldır.
+    TresrClient,TresrResponse,TrestRequest ile uyumlu restvfull apiler olmaldır.
+   10. Kurulum & Dağıtım
+ - Paylaşımlı Cpanel de composer kullanımı yok .
+   Bu nedenle local de kurulum yapılacak ve cpanel hosting e taşınacak.
+   Tüm yapı buna uygun tasarlanmaldır.
+ - Local de d:\XAMPP\ yüklü. kurulum için  install.bat  dosyası oluştur. 
+  - Local geliştirme ortamı: Laravel Sail / Valet / Herd tercih edilebilir
+    - /doc/install.md dosyası oluşturulmalı
+    - Windows kullanıcıları için basit install.bat dosyası hazırlanmalı. Çok önemli . 
+ 
+Şimdi senden istediğim:
+Bu kurallara ve akışa %100 uygun, temiz, güvenli ve modern Laravel kod yapısını düşünerek projeyi baştan planla.
+Geren Tüm dosyaları oluştur.
+Lütfen aşağıdaki başlıklarla detaylı olarak ayarla
+Veritabanı şeması (tablolar + önemli sütunlar + indexler)
+Şimdilik döküman oluşturmana gerek yok .
+ bu işlemler için pull request oluştur.
